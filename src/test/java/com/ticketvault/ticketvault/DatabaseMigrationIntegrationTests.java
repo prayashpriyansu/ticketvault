@@ -1,22 +1,21 @@
 package com.ticketvault.ticketvault;
 
+import com.ticketvault.ticketvault.support.PostgresTestConfiguration;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @SpringBootTest
-@Testcontainers
+@Import(PostgresTestConfiguration.class)
 class DatabaseMigrationIntegrationTests {
 
     private final JdbcTemplate jdbcTemplate;
@@ -25,11 +24,6 @@ class DatabaseMigrationIntegrationTests {
     DatabaseMigrationIntegrationTests(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
-    @Container
-    @ServiceConnection
-    private static final PostgreSQLContainer postgreSQLContainer =
-            new PostgreSQLContainer("postgres:18");
 
     @Test
     @Transactional
@@ -53,7 +47,7 @@ class DatabaseMigrationIntegrationTests {
         );
 
         OffsetDateTime createdAt = jdbcTemplate.queryForObject(
-            "SELECT created_at FROM users WHERE id = ?",
+                "SELECT created_at FROM users WHERE id = ?",
                 OffsetDateTime.class,
                 userId
         );
